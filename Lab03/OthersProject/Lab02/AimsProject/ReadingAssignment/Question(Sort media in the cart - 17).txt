@@ -1,0 +1,42 @@
+Question: Comparable vs Comparator in AIMS Program
+
+1. What class should implement the Comparable interface?
+=> The class Media should implement Comparable<Media> since it is the superclass of all types of media.
+
+Example:
+public abstract class Media implements Comparable<Media> {
+    ...
+}
+
+2. How should you implement compareTo() to reflect the desired ordering?
+=> If you want to sort by title then by cost (in ascending order), implement like this:
+
+@Override
+public int compareTo(Media other) {
+    int titleCompare = this.title.compareToIgnoreCase(other.title);
+    if (titleCompare != 0) return titleCompare;
+    return Float.compare(this.cost, other.cost);
+}
+
+3. Can we have two ordering rules if we use Comparable?
+=> No. Comparable only allows one default sorting rule through the compareTo() method.
+=> If we want multiple sorting rules (e.g., title → cost and cost → title), we must use Comparator objects instead.
+
+4. Suppose DVDs have a different ordering rule from the other media types (title → decreasing length → cost). How would you modify your code?
+=> You should NOT rely on the compareTo() method anymore.
+=> Instead, create a custom Comparator specific to DigitalVideoDisc:
+
+public class DVDComparatorByTitleLengthCost implements Comparator<DigitalVideoDisc> {
+    @Override
+    public int compare(DigitalVideoDisc d1, DigitalVideoDisc d2) {
+        int titleComp = d1.getTitle().compareToIgnoreCase(d2.getTitle());
+        if (titleComp != 0) return titleComp;
+
+        int lengthComp = Integer.compare(d2.getLength(), d1.getLength()); // decreasing
+        if (lengthComp != 0) return lengthComp;
+
+        return Float.compare(d1.getCost(), d2.getCost());
+    }
+}
+
+=> Then use this comparator when you sort DVDs only.
